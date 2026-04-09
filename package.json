@@ -1,0 +1,25 @@
+{
+  "name": "@arraypress/oembed-card",
+  "version": "1.0.0",
+  "description": "Generate self-contained HTML cards for oEmbed rich responses. All styles inline — safe for embedding anywhere.",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    }
+  },
+  "files": ["src"],
+  "scripts": {
+    "test": "node --test tests/oembed-card.test.js"
+  },
+  "keywords": ["oembed", "card", "html", "embed", "rich", "preview", "product", "social"],
+  "author": "David Sherlock",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arraypress/oembed-card.git"
+  }
+}
