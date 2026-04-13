@@ -14,10 +14,18 @@
 // ── HTML Escaping ───────────────────────────
 
 /**
- * Escape a string for safe HTML output.
+ * Escape a string for safe inclusion in HTML output.
+ * Replaces &, <, >, and " with their HTML entity equivalents.
  *
- * @param {string} str - String to escape.
- * @returns {string} Escaped string.
+ * @param {string} str - The string to escape (null/undefined treated as empty string).
+ * @returns {string} The HTML-escaped string.
+ *
+ * @example
+ * escapeHtml('Hello <world> & "friends"');
+ * // 'Hello &lt;world&gt; &amp; &quot;friends&quot;'
+ *
+ * @example
+ * escapeHtml(null);  // ''
  */
 export function escapeHtml(str) {
   return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -26,30 +34,42 @@ export function escapeHtml(str) {
 // ── SVG Icons ───────────────────────────────
 
 /**
- * Generate an inline SVG check icon.
+ * Generate an inline SVG check/tick icon.
  *
- * @param {string} color - Stroke color.
- * @returns {string} SVG markup.
+ * @param {string} color - Stroke color for the check mark (e.g. '#6366f1' or 'green').
+ * @returns {string} SVG markup string (12x12 pixels).
+ *
+ * @example
+ * checkIcon('#6366f1');
+ * // '<svg width="12" height="12" ...><polyline points="20 6 9 17 4 12"/></svg>'
  */
 export function checkIcon(color) {
   return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 }
 
 /**
- * Generate an inline SVG star icon.
+ * Generate an inline SVG star icon, either filled (gold) or empty (grey).
  *
- * @param {boolean} filled - Whether the star is filled (gold) or empty (grey).
- * @returns {string} SVG markup.
+ * @param {boolean} filled - Whether the star should be filled (gold) or empty (dark grey).
+ * @returns {string} SVG markup string (14x14 pixels).
+ *
+ * @example
+ * starIcon(true);   // filled gold star SVG
+ * starIcon(false);  // empty grey star SVG
  */
 export function starIcon(filled) {
   return `<svg width="14" height="14" viewBox="0 0 24 24" fill="${filled ? '#facc15' : '#374151'}" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
 }
 
 /**
- * Generate an inline SVG logo/brand icon.
+ * Generate an inline SVG brand/logo icon with three vertical bars at varying opacity.
  *
- * @param {string} color - Fill color.
- * @returns {string} SVG markup.
+ * @param {string} color - Fill color for the bars (e.g. '#6366f1').
+ * @returns {string} SVG markup string (14x14 pixels).
+ *
+ * @example
+ * logoIcon('#6366f1');
+ * // '<svg width="14" height="14" ...>...</svg>'
  */
 export function logoIcon(color) {
   return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="4" height="12" rx="2" fill="${color}" opacity="0.4"/><rect x="10" y="3" width="4" height="18" rx="2" fill="${color}"/><rect x="18" y="8" width="4" height="8" rx="2" fill="${color}" opacity="0.6"/></svg>`;
@@ -58,11 +78,19 @@ export function logoIcon(color) {
 // ── Card Sections ───────────────────────────
 
 /**
- * Build the star rating HTML.
+ * Build the star rating HTML section for a card.
+ * Returns an empty string if there are no ratings.
  *
- * @param {number} count - Number of ratings.
- * @param {number} avg - Average rating (0-5).
- * @returns {string} HTML markup, or empty string if no ratings.
+ * @param {number} count - Number of ratings (0 or negative returns empty string).
+ * @param {number} avg - Average rating value (0-5, rounded to nearest integer for display).
+ * @returns {string} HTML markup for the star rating row, or empty string if count <= 0.
+ *
+ * @example
+ * buildStars(42, 4.5);
+ * // '<div style="...">★★★★★ <span>(42)</span></div>'
+ *
+ * @example
+ * buildStars(0, 0);  // ''
  */
 export function buildStars(count, avg) {
   if (count <= 0) return '';
@@ -75,11 +103,20 @@ export function buildStars(count, avg) {
 }
 
 /**
- * Build the features list HTML.
+ * Build the features list HTML section for a card.
+ * Shows up to 3 features, each with a colored check icon.
+ * Returns an empty string if there are no features.
  *
- * @param {string[]} features - Feature strings (max 3 shown).
- * @param {string} brandColor - Color for check icons.
- * @returns {string} HTML markup, or empty string if no features.
+ * @param {string[]} features - Array of feature description strings (max 3 displayed).
+ * @param {string} brandColor - Hex color for the check icons.
+ * @returns {string} HTML markup for the features row, or empty string if no features.
+ *
+ * @example
+ * buildFeatures(['Free shipping', '30-day returns', 'Warranty'], '#6366f1');
+ * // '<div style="...">✓ Free shipping  ✓ 30-day returns  ✓ Warranty</div>'
+ *
+ * @example
+ * buildFeatures([], '#000');  // ''
  */
 export function buildFeatures(features, brandColor) {
   if (!features || !features.length) return '';
@@ -90,14 +127,24 @@ export function buildFeatures(features, brandColor) {
 }
 
 /**
- * Build the image section HTML (product image or gradient placeholder).
+ * Build the image section HTML for a card.
+ * If an image URL is provided, renders the product image with an optional price badge overlay.
+ * If no image URL is provided, renders a gradient placeholder with the brand icon.
  *
- * @param {string} imageUrl - Product image URL (empty for placeholder).
- * @param {string} productUrl - Link target URL.
- * @param {string} name - Product name (for alt text).
- * @param {string} priceStr - Formatted price string (for badge overlay).
- * @param {string} brandColor - Brand color (for placeholder icon).
- * @returns {string} HTML markup.
+ * @param {string} imageUrl - Product image URL (empty string for gradient placeholder).
+ * @param {string} productUrl - Link target URL for the image.
+ * @param {string} name - Product name used for alt text.
+ * @param {string} priceStr - Formatted price string for the badge overlay (empty to hide badge).
+ * @param {string} brandColor - Brand color for the placeholder icon.
+ * @returns {string} HTML markup for the image section.
+ *
+ * @example
+ * buildImage('https://store.com/widget.jpg', 'https://store.com/widget', 'Widget', '$29.99', '#6366f1');
+ * // '<a href="..."><img src="..." alt="Widget" /><span>$29.99</span></a>'
+ *
+ * @example
+ * buildImage('', 'https://store.com/widget', 'Widget', '', '#6366f1');
+ * // '<a href="..."><div style="...gradient...">...</div></a>'
  */
 export function buildImage(imageUrl, productUrl, name, priceStr, brandColor) {
   if (imageUrl) {
@@ -126,24 +173,27 @@ export function buildImage(imageUrl, productUrl, name, priceStr, brandColor) {
 
 /**
  * Build a self-contained HTML card for oEmbed rich responses.
- *
  * All styles are inline — no external CSS needed. Safe for embedding
  * in Slack, Discord, social media, or any oEmbed consumer.
  *
- * @param {Object} opts - Card options.
+ * The card includes: product image (or gradient placeholder), collection label,
+ * product name, star ratings, description, feature checklist, CTA button,
+ * and a branded footer.
+ *
+ * @param {Object} opts - Card configuration options.
  * @param {string} opts.productUrl - URL to the product page.
  * @param {string} opts.name - Product/item name.
- * @param {string} [opts.description] - Short description (clamped to 2 lines).
- * @param {string} [opts.imageUrl] - Product image URL.
- * @param {string} [opts.collection] - Collection/category label.
- * @param {string} [opts.priceStr] - Formatted price string (e.g. '$29.99').
- * @param {string} opts.brandColor - Brand accent color (hex).
- * @param {string} opts.storeName - Store/brand name for footer.
- * @param {string[]} [opts.features] - Feature list (max 3 shown).
- * @param {number} [opts.ratingCount] - Number of ratings.
+ * @param {string} [opts.description] - Short description (clamped to 2 lines via CSS).
+ * @param {string} [opts.imageUrl] - Product image URL (omit for gradient placeholder).
+ * @param {string} [opts.collection] - Collection/category label shown above the name.
+ * @param {string} [opts.priceStr] - Formatted price string (e.g. '$29.99') for badge and button.
+ * @param {string} opts.brandColor - Brand accent color as hex string (e.g. '#6366f1').
+ * @param {string} opts.storeName - Store/brand name displayed in the card footer.
+ * @param {string[]} [opts.features] - Feature list (max 3 shown with check icons).
+ * @param {number} [opts.ratingCount] - Number of ratings (0 hides the rating section).
  * @param {number} [opts.ratingAvg] - Average rating (0-5).
  * @param {number} opts.width - Card max width in pixels.
- * @returns {string} Self-contained HTML string.
+ * @returns {string} Self-contained HTML string ready for oEmbed embedding.
  *
  * @example
  * const html = buildOEmbedCard({
